@@ -1,21 +1,56 @@
 'use strict';
 
 const express = require('express');
-const socketIO = require('socket.io');
-const path = require('path');
+var io = require('socket.io-client');
+var socket = io.connect('ws://atintegration.herokuapp.com', {
+    reconnect: true
+});
 
-const PORT = process.env.PORT || 3000;
+var osc = require("osc");
+const path = require('path');
+const PORT = process.env.PORT || 4000;
 const INDEX = path.join(__dirname, 'index.html');
 
 const server = express()
-  .use((req, res) => res.sendFile(INDEX) )
-  .listen(PORT, () => console.log(`Listening on ${ PORT }`));
+    .use((req, res) => res.sendFile(INDEX))
+    .listen(PORT, () => console.log(`Listening on ${ PORT }`));
 
-const io = socketIO(server);
 
-io.on('connection', (socket) => {
-  console.log('Client connected');
-  socket.on('disconnect', () => console.log('Client disconnected'));
+// SOCKET IO Add a connect listener
+socket.on('connect', function(socket) {
+    console.log('Connected!');
 });
 
-setInterval(() => io.emit('time', new Date().toTimeString()), 1000);
+socket.on("hello", function(msg){
+  console.log("hello hello");
+})
+
+socket.on('settings', function(data){
+  const settings = data;
+  console.log("received settings :: " + data);
+
+  var udpPort = new osc.UDPPort({
+      localAddress: "0.0.0.0",
+      localPort: settings.oscInputPort
+  });
+
+  //send osc message to server
+  udpPort.on("message", function(oscMsg) {
+      console.log(oscMsg);
+      socket.emit(oscMsg.address, oscMsg.args)
+  });
+
+  for (let param of settings.params) {
+    socket.on(param, (data) => {
+        udpPort.send({
+            address: param,
+            args: data
+        }, "127.0.0.1", settings.oscOutputPort);
+    });
+  }
+
+
+
+  // Open the socket.
+  udpPort.open();
+});
