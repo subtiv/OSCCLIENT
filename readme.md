@@ -1,7 +1,8 @@
-# Node.js Socket.io Example
+# Art & Tech Integration Websocket to Osc client
 
-This example accompanies the
-[Using WebSockets on Heroku with Node.js](https://devcenter.heroku.com/articles/node-websockets)
-tutorial.
+run
+*git clone this repo
+*$ npm install 
+*$ node server
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy)
+OSC settings / visualisations on : https://atintegration.herokuapp.com
