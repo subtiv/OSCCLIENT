@@ -1,26 +1,39 @@
 'use strict';
 
 const express = require('express');
-var io = require('socket.io-client');
-var socket = io.connect('ws://atintegration.herokuapp.com', {
+const app = express();
+const io = require('socket.io-client');
+const socket = io.connect('ws://atintegration.herokuapp.com', {
     reconnect: true
 });
 
-var osc = require("osc");
+const osc = require("osc");
 const path = require('path');
 const PORT = process.env.PORT || 4000;
 const INDEX = path.join(__dirname, 'index.html');
 var messages = {};
 
-const server = express()
-    .use((req, res) => res.sendFile(INDEX))
-    .listen(PORT, () => {
+//app.use((req, res) => res.sendFile(INDEX))
+
+app.get('/allo', function (req, res) {
+  res.send('Hello World!')
+});
+
+app.get('/', function (req, res) {
+  res.sendFile(INDEX)
+});
+
+app.use(express.static('public'))
+
+    app.listen(PORT, function () {
       var art = require('ascii-art');
       art.font('ART & TECH  INTEGRATION', 'Doom', function(rendered){
           console.log(rendered);
           console.log("Check out https://atintegration.herokuapp.com for settings");
       });
-    }) ;
+    });
+
+
 
 // SOCKET IO Add a connect listener
 socket.on('connect', function(socket) {
