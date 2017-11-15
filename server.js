@@ -3,9 +3,12 @@
 const express = require('express');
 const app = express();
 const io = require('socket.io-client');
-const socket = io.connect('ws://atintegration.herokuapp.com', {
+const socket = io.connect('ws://nmd17server.herokuapp.com', {
     reconnect: true
 });
+// const socket = io.connect('http://localhost:3000/', {
+//     reconnect: true
+// });
 
 const osc = require("osc");
 const path = require('path');
@@ -24,12 +27,11 @@ app.get('/', function (req, res) {
 });
 
 app.use(express.static('public'))
-
     app.listen(PORT, function () {
       var art = require('ascii-art');
-      art.font('ART & TECH  INTEGRATION', 'Doom', function(rendered){
+      art.font('ART & TECH   NMD', 'Doom', function(rendered){
           console.log(rendered);
-          console.log("Check out https://atintegration.herokuapp.com for settings");
+          console.log("Check out https://nmd17server.herokuapp.com for settings");
       });
     });
 
@@ -67,21 +69,21 @@ socket.on('settings', function(data){
   //send osc message to server
   udpPort.on("message", function(oscMsg) {
       messages[oscMsg.address] = oscMsg.args;
-      socket.emit(oscMsg.address, oscMsg.args)
+      socket.emit("clientvalue", {name: oscMsg.address, value:oscMsg.args})
   });
 
   setInterval(function () {
       console.log(messages);
   }, 300);
 
-  for (let param of settings.params) {
-    socket.on(param, (data) => {
+
+    socket.on("servervalue", (data) => {
         udpPort.send({
-            address: param,
-            args: data
+            address: data.name,
+            args: data.value
         }, "127.0.0.1", settings.oscOutputPort);
     });
-  }
+
   // Open the socket.
   udpPort.open();
 });
