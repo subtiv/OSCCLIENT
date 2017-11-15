@@ -1,8 +1,8 @@
-# Art & Tech Integration Websocket to Osc client
+# Art & Tech NMD Websocket to Osc client
 
 run
 * git clone this repo
-* $ npm install 
+* $ npm install
 * $ node server
 
-OSC settings / visualisations on : https://atintegration.herokuapp.com
+config on : https://nmd17server.herokuapp.com/. More information on Canvas.
